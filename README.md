@@ -1,1 +1,1 @@
-# boss-game
+index.html - code for game
