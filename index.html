@@ -15,7 +15,7 @@
             align-items: center;
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #ffefd5, #fff5e6);
-            transition: background-color 0.5s;
+            transition: background-color 0.5s, background-image 0.5s;
             -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
         }
 
@@ -129,16 +129,16 @@
         let gameStarted = false;
 
         const bosses = [
-            { health: 100, image: 'boss1.png', bgColor: '#ffefd5', level: 1 },  // Босс 1 уровня
-            { health: 200, image: 'boss2.png', bgColor: '#e7f3fc', level: 2 },
-            { health: 300, image: 'boss3.png', bgColor: '#f3f8e7', level: 3 },
-            { health: 400, image: 'boss4.png', bgColor: '#fce7d2', level: 4 },
-            { health: 500, image: 'boss5.png', bgColor: '#f7e7fc', level: 5 },
-            { health: 600, image: 'boss6.png', bgColor: '#e7f9fc', level: 6 },
-            { health: 700, image: 'boss7.png', bgColor: '#f0f8e7', level: 7 },
-            { health: 800, image: 'boss8.png', bgColor: '#fce7f7', level: 8 },
-            { health: 900, image: 'boss9.png', bgColor: '#e7e7fc', level: 9 },
-            { health: 1000, image: 'boss10.png', bgColor: '#e7e7e7', level: 10 },
+            { health: 100, image: 'boss1.png', bgColor: '#ffefd5', level: 1, backgroundImage: 'url("background1.jpg")' },  // Босс 1 уровня
+            { health: 200, image: 'boss2.png', bgColor: '#e7f3fc', level: 2, backgroundImage: 'url("background2.jpg")' },
+            { health: 300, image: 'boss3.png', bgColor: '#f3f8e7', level: 3, backgroundImage: 'url("background3.jpg")' },
+            { health: 400, image: 'boss4.png', bgColor: '#fce7d2', level: 4, backgroundImage: 'url("background4.jpg")' },
+            { health: 500, image: 'boss5.png', bgColor: '#f7e7fc', level: 5, backgroundImage: 'url("background5.jpg")' },
+            { health: 600, image: 'boss6.png', bgColor: '#e7f9fc', level: 6, backgroundImage: 'url("background6.jpg")' },
+            { health: 700, image: 'boss7.png', bgColor: '#f0f8e7', level: 7, backgroundImage: 'url("background7.jpg")' },
+            { health: 800, image: 'boss8.png', bgColor: '#fce7f7', level: 8, backgroundImage: 'url("background8.jpg")' },
+            { health: 900, image: 'boss9.png', bgColor: '#e7e7fc', level: 9, backgroundImage: 'url("background9.jpg")' },
+            { health: 1000, image: 'boss10.png', bgColor: '#e7e7e7', level: 10, backgroundImage: 'url("background10.jpg")' },
         ];
 
         let currentBossIndex = 0;
@@ -174,6 +174,7 @@
             healthBarInner.style.backgroundColor = '#4caf50';
             boss.src = bossData.image;
             document.body.style.backgroundColor = bossData.bgColor;
+            document.body.style.backgroundImage = bossData.backgroundImage;
             boss.style.animation = ''; // Убираем мигание
             levelText.textContent = `Уровень ${bossData.level}`;
         }
