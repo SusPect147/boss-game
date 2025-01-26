@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Современная игра</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffefd5, #fff5e6);
+            transition: background-color 0.5s;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        .timer {
+            position: absolute;
+            top: 3%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        .health-bar {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 25px;
+            background-color: #ccc;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid #444;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        .health-bar-inner {
+            width: 100%;
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.2s, background-color 0.3s;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        .boss {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            cursor: pointer;
+            animation: growShrinkAnimation 1.5s infinite;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        @keyframes growShrinkAnimation {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+
+        #start-button {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+
+        #start-button:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+-webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="timer" class="timer">Time Left: 60s</div>
+
+    <div id="health-bar" class="health-bar">
+        <div id="health-bar-inner" class="health-bar-inner"></div>
+    </div>
+
+    <img id="boss" class="boss" src="boss1.png" alt="Boss" />
+
+    <button id="start-button">Start Game</button>
+
+    <script>
+        const boss = document.getElementById('boss');
+        const healthBarInner = document.getElementById('health-bar-inner');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('start-button');
+    
+        let maxHealth = 100;
+        let currentHealth = maxHealth;
+        let totalTime = 60;
+        let timeLeft = totalTime;
+        let timerInterval;
+        let gameStarted = false;
+    
+        const bosses = [
+            { health: 100, image: 'boss1.png', bgColor: '#ffefd5' },
+            { health: 300, image: 'boss2.png', bgColor: '#e7f3fc' },
+            { health: 700, image: 'boss3.png', bgColor: '#f3f8e7' },
+        ];
+    
+        let currentBossIndex = 0;
+    
+        function startGame() {
+            if (startButton.textContent === "Отличная игра!") {
+                resetGameState(); // Сбрасываем состояние игры
+                return;
+            }
+    
+            if (startButton.textContent === "Start Game") {
+                gameStarted = true;
+                timeLeft = totalTime;
+                currentBossIndex = 0;
+                loadBoss();
+    
+                boss.style.pointerEvents = 'auto'; // Разрешаем клики на босса
+                startButton.style.display = 'none';
+                timerElement.style.display = 'block';
+    
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = `Time Left: ${timeLeft}s`;
+    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        endGame(false);
+                    }
+                }, 1000);
+            }
+        }
+    
+        function resetGameState() {
+            gameStarted = false; // Останавливаем игру
+            currentBossIndex = 0; // Сбрасываем босса на первый
+            timeLeft = totalTime; // Сбрасываем таймер
+            loadBoss();
+            boss.style.pointerEvents = 'none'; // Делаем босса неактивным
+            startButton.textContent = "Start Game"; // Меняем текст кнопки
+            timerElement.style.display = 'none'; // Скрываем таймер
+        }
+    
+        function loadBoss() {
+            const bossData = bosses[currentBossIndex];
+            maxHealth = bossData.health;
+            currentHealth = maxHealth;
+            healthBarInner.style.width = '100%';
+            healthBarInner.style.backgroundColor = '#4caf50';
+            boss.src = bossData.image;
+            document.body.style.backgroundColor = bossData.bgColor;
+            boss.style.animation = ''; // Убираем мигание
+        }
+    
+        boss.addEventListener('click', () => {
+            if (gameStarted && timeLeft > 0 && currentHealth > 0) {
+                currentHealth -= 20;
+    
+                if (currentHealth < 0) currentHealth = 0;
+    
+                const healthPercentage = (currentHealth / maxHealth) * 100;
+                healthBarInner.style.width = `${healthPercentage}%`;
+    
+                if (currentHealth === 0) {
+                    currentBossIndex++;
+                    if (currentBossIndex >= bosses.length) {
+                        clearInterval(timerInterval);
+                        endGame(true);
+                    } else {
+                        loadBoss();
+                    }
+                }
+            }
+        });
+    
+        function endGame(won) {
+            boss.style.pointerEvents = 'none'; // Блокируем клики на босса
+            timerElement.style.display = 'none'; // Скрываем таймер
+            startButton.style.display = 'block'; // Показываем кнопку
+            startButton.textContent = won ? "Отличная игра!" : "Start Game"; // Меняем текст кнопки
+            boss.style.animation = ''; // Убираем мигание
+            gameStarted = false;
+        }
+    
+        startButton.addEventListener('click', startGame);
+    </script>
+    
+    
+</body>
+</html>
