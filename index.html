@@ -14,23 +14,30 @@
             justify-content: center;
             align-items: center;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ffefd5, #fff5e6);
+            background: #000; /* Черный фон */
+            color: #fff; /* Белый текст */
             transition: background-color 0.5s, background-image 0.5s;
             -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
         }
 
         .timer {
-            position: absolute;
-            top: 3%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2rem;
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    color: #fff; /* Белый текст */
+    background: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1); /* Белая тень */
+    border: 1px solid #fff; /* Белая граница */
+    width: 70%;
+    text-align: center; /* Выравнивание текста по центру по горизонтали */
+    display: flex; /* Использование Flexbox */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    justify-content: center; /* Выравнивание по центру по горизонтали */
+}
 
         .health-bar {
             position: absolute;
@@ -39,17 +46,17 @@
             transform: translateX(-50%);
             width: 60%;
             height: 25px;
-            background-color: #ccc;
+            background-color: #333; /* Темно-серый фон */
             border-radius: 20px;
             overflow: hidden;
-            border: 2px solid #444;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid #fff; /* Белая граница */
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2); /* Белая тень */
         }
 
         .health-bar-inner {
             width: 100%;
             height: 100%;
-            background-color: #4caf50;
+            background-color: #fff; /* Белый цвет здоровья */
             transition: width 0.2s, background-color 0.3s;
         }
 
@@ -63,6 +70,7 @@
             cursor: pointer;
             animation: growShrinkAnimation 1.5s infinite;
             pointer-events: none;
+            transition: transform 0.3s, width 0.3s, height 0.3s;
         }
 
         @keyframes growShrinkAnimation {
@@ -79,26 +87,60 @@
             font-size: 1.5rem;
             padding: 15px 30px;
             cursor: pointer;
-            color: #fff;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            border: none;
+            color: #000; /* Черный текст */
+            background: #fff; /* Белый фон */
+            border: 2px solid #000; /* Черная граница */
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2); /* Белая тень */
             transition: transform 0.3s, box-shadow 0.3s;
+            width: 80%;
         }
 
         #start-button:hover {
             transform: translateX(-50%) scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3); /* Белая тень */
         }
 
         .level-text {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #fff; /* Белый текст */
+        }
+
+        .final-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #fff; /* Белый текст */
+            text-align: center;
+            display: none;
+        }
+
+        #next-level-button {
             position: absolute;
             bottom: 10%;
             left: 50%;
             transform: translateX(-50%);
             font-size: 1.5rem;
-            color: #333;
+            padding: 15px 30px;
+            cursor: pointer;
+            color: #000; /* Черный текст */
+            background: #fff; /* Белый фон */
+            border: 2px solid #000; /* Черная граница */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2); /* Белая тень */
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: none;
+        }
+
+        #next-level-button:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3); /* Белая тень */
         }
     </style>
 </head>
@@ -113,13 +155,18 @@
     <div id="level-text" class="level-text">Уровень 1</div>
 
     <button id="start-button">Нажми чтобы начать</button>
+    <button id="next-level-button">Нажми чтобы играть</button>
+
+    <div id="final-message" class="final-message">Вы победили всех боссов на данный момент. Ждите большего</div>
 
     <script>
         const boss = document.getElementById('boss');
         const healthBarInner = document.getElementById('health-bar-inner');
         const timerElement = document.getElementById('timer');
         const startButton = document.getElementById('start-button');
+        const nextLevelButton = document.getElementById('next-level-button');
         const levelText = document.getElementById('level-text');
+        const finalMessage = document.getElementById('final-message');
 
         let maxHealth = 100;
         let currentHealth = maxHealth;
@@ -129,32 +176,48 @@
         let gameStarted = false;
 
         const bosses = [
-            { health: 100, image: 'boss1.png', bgColor: '#ffefd5', level: 1, backgroundImage: 'url("background1.jpg")' },  // Босс 1 уровня
-            { health: 200, image: 'boss2.png', bgColor: '#e7f3fc', level: 2, backgroundImage: 'url("background2.jpg")' },
-            { health: 300, image: 'boss3.png', bgColor: '#f3f8e7', level: 3, backgroundImage: 'url("background3.jpg")' },
-            { health: 400, image: 'boss4.png', bgColor: '#fce7d2', level: 4, backgroundImage: 'url("background4.jpg")' },
-            { health: 500, image: 'boss5.png', bgColor: '#f7e7fc', level: 5, backgroundImage: 'url("background5.jpg")' },
-            { health: 600, image: 'boss6.png', bgColor: '#e7f9fc', level: 6, backgroundImage: 'url("background6.jpg")' },
-            { health: 700, image: 'boss7.png', bgColor: '#f0f8e7', level: 7, backgroundImage: 'url("background7.jpg")' },
-            { health: 800, image: 'boss8.png', bgColor: '#fce7f7', level: 8, backgroundImage: 'url("background8.jpg")' },
-            { health: 900, image: 'boss9.png', bgColor: '#e7e7fc', level: 9, backgroundImage: 'url("background9.jpg")' },
-            { health: 1000, image: 'boss10.png', bgColor: '#e7e7e7', level: 10, backgroundImage: 'url("background10.jpg")' },
+            { health: 100, image: 'boss1.png', bgColor: '#000', level: 1, size: 200 },
+            { health: 200, image: 'boss2.png', bgColor: '#000', level: 2, size: 225 },
+            { health: 300, image: 'boss3.png', bgColor: '#000', level: 3, size: 250 },
+            { health: 400, image: 'boss4.png', bgColor: '#000', level: 4, size: 275 },
+            { health: 500, image: 'boss5.png', bgColor: '#000', level: 5, size: 300 },
+            { health: 600, image: 'boss6.png', bgColor: '#000', level: 6, size: 325 },
+            { health: 700, image: 'boss7.png', bgColor: '#000', level: 7, size: 350 },
+            { health: 800, image: 'boss8.png', bgColor: '#000', level: 8, size: 375 },
+            { health: 900, image: 'boss9.png', bgColor: '#000', level: 9, size: 400 },
+            { health: 1000, image: 'boss10.png', bgColor: '#000', level: 10, size: 425 },
         ];
 
         let currentBossIndex = 0;
 
         function startGame() {
             boss.style.pointerEvents = 'auto'; // Включаем клики для босса
-
             startButton.style.display = 'none';  // Скрываем кнопку старта
-
+            nextLevelButton.style.display = 'none'; // Скрываем кнопку следующего уровня
             gameStarted = true;
             timeLeft = totalTime;
-            currentBossIndex = 0;
             loadBoss();
+            startTimer();
+        }
 
+        function loadBoss() {
+            const bossData = bosses[currentBossIndex];
+            maxHealth = bossData.health;
+            currentHealth = maxHealth;
+            healthBarInner.style.width = '100%';
+            healthBarInner.style.backgroundColor = '#fff'; /* Белый цвет здоровья */
+            boss.src = bossData.image;
+            boss.style.width = `${bossData.size}px`;
+            boss.style.height = `${bossData.size}px`;
+            document.body.style.background = bossData.bgColor; // Меняем фон
+            levelText.textContent = `Уровень ${bossData.level}`;
+        }
+
+        function startTimer() {
             timerElement.style.display = 'block';
+            timerElement.textContent = `Time Left: ${timeLeft}s`;
 
+            clearInterval(timerInterval); // Очищаем предыдущий таймер
             timerInterval = setInterval(() => {
                 timeLeft--;
                 timerElement.textContent = `Time Left: ${timeLeft}s`;
@@ -164,19 +227,6 @@
                     endGame(false);
                 }
             }, 1000);
-        }
-
-        function loadBoss() {
-            const bossData = bosses[currentBossIndex];
-            maxHealth = bossData.health;
-            currentHealth = maxHealth;
-            healthBarInner.style.width = '100%';
-            healthBarInner.style.backgroundColor = '#4caf50';
-            boss.src = bossData.image;
-            document.body.style.backgroundColor = bossData.bgColor;
-            document.body.style.backgroundImage = bossData.backgroundImage;
-            boss.style.animation = ''; // Убираем мигание
-            levelText.textContent = `Уровень ${bossData.level}`;
         }
 
         boss.addEventListener('click', () => {
@@ -189,43 +239,54 @@
                 healthBarInner.style.width = `${healthPercentage}%`;
 
                 if (currentHealth === 0) {
+                    clearInterval(timerInterval);
                     currentBossIndex++;
                     if (currentBossIndex >= bosses.length) {
-                        clearInterval(timerInterval);
                         endGame(true);
                     } else {
+                        // Загружаем следующего босса и показываем кнопку
                         loadBoss();
+                        nextLevelButton.style.display = 'block';
+                        gameStarted = false;
                     }
                 }
             }
         });
 
         function endGame(won) {
-            boss.style.pointerEvents = 'none';
-            timerElement.style.display = 'none';
-            startButton.style.display = 'block'; // Показываем кнопку старта
-            startButton.textContent = won ? "Переиграешь еще раз?" : "Готов отыграться?";
-
-            // После игры сбрасываем все к начальному состоянию
+            if (won) {
+                // Если победа над всеми боссами
+                if (currentBossIndex >= bosses.length) {
+                    hideGameElements();
+                    finalMessage.style.display = 'block';
+                }
+            } else {
+                startButton.style.display = 'block';
+                startButton.textContent = "Готов отыграться?";
+            }
             gameStarted = false;
-            resetGame();
         }
 
-        function resetGame() {
-            currentBossIndex = 0;
-            loadBoss(); // Загружаем первого босса
-            healthBarInner.style.width = '100%';
-            healthBarInner.style.backgroundColor = '#4caf50';
-            timeLeft = totalTime;
-            timerElement.textContent = `Time Left: ${timeLeft}s`;
+        function hideGameElements() {
+            timerElement.style.display = 'none';
+            healthBarInner.style.display = 'none';
+            boss.style.display = 'none';
+            levelText.style.display = 'none';
+            startButton.style.display = 'none';
+            nextLevelButton.style.display = 'none';
         }
 
         startButton.addEventListener('click', () => {
             if (!gameStarted) {
                 startGame();
             } else {
-                resetGame();  // Перезапуск игры после окончания
+                timeLeft = totalTime; // Сброс таймера для нового босса
+                startGame();
             }
+        });
+
+        nextLevelButton.addEventListener('click', () => {
+            startGame();
         });
     </script>
 </body>
